@@ -60,26 +60,27 @@ except FileNotFoundError:
     log('Authorization data is not spicified yet. Please, do it in config.cfg', LOGLEVEL.WARNING)
     exit(1)
 
-imap = imaplib.IMAP4_SSL(imap_server)
-
-# Authorization
-try:
-    log('Authorization attempt...')
-    control(imap.login(username, mail_pass))
-except Exception as e:
-    log(f'Authorization error. {e}', LOGLEVEL.ERROR)
-    raise e
-log('Authorized.')
-
-# Folder select
-try:
-    log(f'Changing folder to {folder}...')
-    control(imap.select(folder))
-except Exception as e:
-    log('Folder changing error. Seens like it does not exist...', LOGLEVEL.ERROR)
-    raise e
-
 def check_inbox():
+    global imap
+    imap = imaplib.IMAP4_SSL(imap_server)
+
+    # Authorization
+    try:
+        log('Authorization attempt...')
+        control(imap.login(username, mail_pass))
+    except Exception as e:
+        log(f'Authorization error. {e}', LOGLEVEL.ERROR)
+        raise e
+    log('Authorized.')
+    
+    # Folder select
+    try:
+        log(f'Changing folder to {folder}...')
+        control(imap.select(folder))
+    except Exception as e:
+        log('Folder changing error. Seens like it does not exist...', LOGLEVEL.ERROR)
+        raise e
+    
     # Get messages
     message_ids = control(imap.search(None, 'ALL'))
     message_ids = message_ids.split(' ')[::-1]
@@ -141,6 +142,7 @@ def check_inbox():
                 # Update README.md
                 with open(os.path.join('public', 'README.md'), 'w') as readme:
                     full_message[0] = 'Hello, %username%,'
+                    full_message.insert(0, '# vpngate-mirrors-bot\n')
                     readme.write('\n'.join(full_message))
 
                 log('Updated.')
@@ -154,4 +156,12 @@ while True:
         git_updater.update()
         log('Pushed.')
     else: log('There is no update.')
+
+    # Closing connection
+    log('Closing collection...')
+    imap.close()
+    imap.logout()
+    del imap
+    log('Connection closed')
+    
     time.sleep(60 * 60) # Every 1 hour

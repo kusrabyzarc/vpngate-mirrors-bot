@@ -142,7 +142,7 @@ def check_inbox():
                 # Update README.md
                 with open(os.path.join('public', 'README.md'), 'w') as readme:
                     full_message[0] = 'Hello, %username%,'
-                    full_message.insert(0, '# vpngate-mirrors-bot\n')
+                    full_message.insert(0, '# vpngate-daily-mirrors\n')
                     readme.write('\n'.join(full_message))
 
                 log('Updated.')

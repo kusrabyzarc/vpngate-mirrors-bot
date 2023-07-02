@@ -10,5 +10,8 @@ def update():
 
     # Pushing...
     os.chdir(os.path.join('..', 'vpngate-daily-mirrors'))
-    os.system('script_pusher.bat')
+    os.system('git add -A')
+    os.system('git commit -m "Update"')
+    os.system('git push ')
+    # os.system(os.path.join('..', 'vpngate-mirrors-bot', 'script_pusher.bat')
     os.chdir(os.path.join('..', 'vpngate-mirrors-bot'))
